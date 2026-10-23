@@ -5,7 +5,7 @@
       hermes.url = "github:NousResearch/hermes-agent";
     };
 
-    outputs = { self, Hermes }:
+    outputs = { self, hermes }:
     let
       system = "x86_64-linux";
     in {
