@@ -1,7 +1,8 @@
-name: Build Hermes Desktop
+name: Build
 
 on:
-  workflow_dispatch:
+  push:
+    branches: main
 
 permissions:
   contents: write
@@ -11,28 +12,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
-      - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v23
+      - uses: DeterminateSystems/nix-installer-action@main
 
-      - name: Generate flake.lock
-        working-directory: hermes
-        run: nix flake lock
+      - uses: cachix/cachix-action@v17
+        with:
+          name: muyg
+          authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
 
-      - name: Commit flake.lock
-        working-directory: hermes
-        run: |
-          if [ -z "$(git status --porcelain flake.lock)" ]; then
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add flake.lock
-          git commit -m "chore(hermes): update flake.lock [skip ci]"
-          git push
+      - run: nix flake check --no-update-lock-file
 
-      - name: Build Hermes Desktop
-        working-directory: hermes
-        run: nix build .#default --print-build-logs
+      - run: nix build .#hermes --no-update-lock-file
