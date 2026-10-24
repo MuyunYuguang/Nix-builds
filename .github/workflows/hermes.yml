@@ -21,6 +21,7 @@ jobs:
         with:
           name: muyg
           authToken: "${{ secrets.CACHIX_AUTH_TOKEN }}"
+          signingKey: "${{ secrets.CACHIX_SIGNING_KEY }}"
 
       - run: nix flake check --no-update-lock-file
 
